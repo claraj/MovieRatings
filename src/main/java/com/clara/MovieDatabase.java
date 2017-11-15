@@ -106,7 +106,7 @@ public class MovieDatabase {
         System.out.println("Created movie_reviews table");
         
         // So can check for a warning,
-        if (statement.getWarnings() != null)  {
+        if (statement.getWarnings() == null)  {
             
             // Could also check for specific error code for a particular problem,
             // if it's useful to know more about the error. statement.getWarnings().getErrorCode() == 1050
