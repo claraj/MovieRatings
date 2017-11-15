@@ -10,6 +10,7 @@ import java.util.Calendar;
 
 
 public class MovieForm extends JFrame implements WindowListener{
+    
     private JTable movieDataTable;
     private JPanel rootPanel;
     private JTextField titleTextField;
@@ -19,7 +20,7 @@ public class MovieForm extends JFrame implements WindowListener{
     private JButton deleteMovieButton;
     private JSpinner ratingSpinner;
 
-    MovieForm(final MovieDataModel movieDataTableModel){
+    MovieForm(final MovieDataModel movieDataTableModel) {
 
         setContentPane(rootPanel);
         pack();
@@ -100,11 +101,17 @@ public class MovieForm extends JFrame implements WindowListener{
                 if (currentRow == -1) {      // -1 means no row is selected. Display error message.
                     JOptionPane.showMessageDialog(rootPane, "Please choose a movie to delete");
                 }
-                boolean deleted = movieDataTableModel.deleteRow(currentRow);
-                if (deleted) {
-                    MovieDatabase.loadAllMovies();
-                } else {
-                    JOptionPane.showMessageDialog(rootPane, "Error deleting movie");
+                
+                else {
+                
+                    try {
+                        movieDataTableModel.deleteRow(currentRow);
+                        MovieDatabase.loadAllMovies();
+                    }
+                    catch (Exception ex){
+                        //Generic error message for the user. Detail error message in console for developer.
+                            JOptionPane.showMessageDialog(rootPane, "Error deleting movie");
+                    }
                 }
             }
         });

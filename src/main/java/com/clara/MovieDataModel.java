@@ -72,9 +72,8 @@ public class MovieDataModel extends AbstractTableModel {
             Object o = resultSet.getObject(col+1);
             return o.toString();
         }catch (SQLException se) {
-            System.out.println(se);
-            //se.printStackTrace();
-            return se.toString();
+            System.out.println("Error getting value for " + row + " " + col + "\n" + se);
+            return "Error!";  // not very helpful for the user. Could also re-throw the error to quit the program here, it's unlikely to be something that can be fixed as the program keeps running.
 
         }
     }
@@ -97,19 +96,21 @@ public class MovieDataModel extends AbstractTableModel {
             //Error dialog box. First argument is the parent GUI component, which is only used to center the
             // dialog box over that component. We don't have a reference to any GUI components here
             // but are allowed to use null - this means the dialog box will show in the center of your screen.
-            JOptionPane.showMessageDialog(null, "Try entering a number between " + MovieDatabase.MOVIE_MIN_RATING + " " + MovieDatabase.MOVIE_MAX_RATING);
+            JOptionPane.showMessageDialog(null, "Try entering a number between " + MovieDatabase.MOVIE_MIN_RATING + " and " + MovieDatabase.MOVIE_MAX_RATING);
             //return prevents the following database update code happening...
             return;
         }
 
         //This only happens if the new rating is valid
+        
+        // These changes get saved back to the database - pretty cool!
         try {
             resultSet.absolute(row + 1);
             resultSet.updateInt(MovieDatabase.RATING_COLUMN, newRating);
             resultSet.updateRow();
             fireTableDataChanged();
         } catch (SQLException e) {
-            System.out.println("error changing rating " + e);
+            System.out.println("Error changing rating " + e);
         }
 
     }
