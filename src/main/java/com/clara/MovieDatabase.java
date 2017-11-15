@@ -44,22 +44,22 @@ public class MovieDatabase {
     
     //Create or recreate a ResultSet containing the whole database, and give it to movieDataModel
     static void loadAllMovies() throws SQLException {
-            
-            if (rs!=null) {
-                rs.close();   /// Close any currently-open result sets
-            }
-            
-            String getAllData = "SELECT * FROM " + MOVIE_TABLE_NAME;
-            rs = statement.executeQuery(getAllData);
-            
-            if (movieDataModel == null) {
-                //If no current movieDataModel, then make one
-                movieDataModel = new MovieDataModel(rs);
-            } else {
-                //Or, if one already exists, update its ResultSet
-                movieDataModel.updateResultSet(rs);
-            }
-            
+        
+        if (rs!=null) {
+            rs.close();   /// Close any currently-open result sets
+        }
+        
+        String getAllData = "SELECT * FROM " + MOVIE_TABLE_NAME;
+        rs = statement.executeQuery(getAllData);
+        
+        if (movieDataModel == null) {
+            //If no current movieDataModel, then make one
+            movieDataModel = new MovieDataModel(rs);
+        } else {
+            //Or, if one already exists, update its ResultSet
+            movieDataModel.updateResultSet(rs);
+        }
+        
     }
     
     /* Sets up driver, creates table, inserts test data.
@@ -69,52 +69,51 @@ public class MovieDatabase {
      */
     private static void setup() throws SQLException{
         
-            
-            //Load driver class
-            try {
-                String Driver = "com.mysql.jdbc.Driver";
-                Class.forName(Driver);
-            } catch (ClassNotFoundException cnfe) {
-                System.out.println("No database drivers found. Quitting");
-                System.exit(-1);  // Crash - need to fix this.
-            }
-            
-            // This connection will be used in the whole program.
-            conn = DriverManager.getConnection(DB_CONNECTION_URL + DB_NAME, USER, PASS);
-            
-            // The first argument ResultSet.TYPE_SCROLL_INSENSITIVE
-            // allows us to move the cursor both forward and backwards through the RowSet
-            // we get from this statement.
-            
-            // Another option is TYPE_SCROLL_SENSITIVE, which means the ResultSet will be updated when
-            // something *else* changes the database. If your DB server was shared, you might need to be concerned about this.
-            
-            // The TableModel will need to go forward and backward through the ResultSet.
-            // by default, you can only move forward - it's less
-            // resource-intensive than being able to go in both directions.            
-            // If you set one argument, you need the other. 
-            // The second one (CONCUR_UPDATABLE) means you will be able to change the ResultSet and these
-            // changes will be made to the DB.... so long as you have a table with a primary key in it. (Otherwise
-            // your database isn't able to definitively identify what has been changed).
-            statement = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
         
-            //Create a table in the database with 3 columns: Movie title, year and rating
-            String createTableSQL = "CREATE TABLE IF NOT EXISTS " + MOVIE_TABLE_NAME + " (" + PK_COLUMN + " int NOT NULL AUTO_INCREMENT, " + TITLE_COLUMN + " varchar(50), " + YEAR_COLUMN + " int, " + RATING_COLUMN + " int, PRIMARY KEY(" + PK_COLUMN + "))";
-            System.out.println(createTableSQL);
-            int rowsModified = statement.executeUpdate(createTableSQL);
-            
-            System.out.println("Created movie_reviews table");
-            
-            // There's another table that's a list of tables. When a new table is added, an entry is made in
-            // the table-of-tables. So if this number is 1, a new table was created.
-            // If it is 0, then the table already existed so no new rows.
-    
-            // Add some test data, but only if this is a new table
-    
-            if (rowsModified == 1) {
-                addTestData();  // You can comment this out, if you don't want to start with test data.
-            }
+        //Load driver class
+        try {
+            String Driver = "com.mysql.jdbc.Driver";
+            Class.forName(Driver);
+        } catch (ClassNotFoundException cnfe) {
+            System.out.println("No database drivers found. Quitting");
+            System.exit(-1);  // Crash - need to fix this.
+        }
         
+        // This connection will be used in the whole program.
+        conn = DriverManager.getConnection(DB_CONNECTION_URL + DB_NAME, USER, PASS);
+        
+        // The first argument ResultSet.TYPE_SCROLL_INSENSITIVE
+        // allows us to move the cursor both forward and backwards through the RowSet
+        // we get from this statement.
+        
+        // Another option is TYPE_SCROLL_SENSITIVE, which means the ResultSet will be updated when
+        // something *else* changes the database. If your DB server was shared, you might need to be concerned about this.
+        
+        // The TableModel will need to go forward and backward through the ResultSet.
+        // by default, you can only move forward - it's less
+        // resource-intensive than being able to go in both directions.
+        // If you set one argument, you need the other.
+        // The second one (CONCUR_UPDATABLE) means you will be able to change the ResultSet and these
+        // changes will be made to the DB.... so long as you have a table with a primary key in it. (Otherwise
+        // your database isn't able to definitively identify what has been changed).
+        statement = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+        
+        //Create a table in the database with 3 columns: Movie title, year and rating
+        String createTableSQL = "CREATE TABLE IF NOT EXISTS " + MOVIE_TABLE_NAME + " (" + PK_COLUMN + " int NOT NULL AUTO_INCREMENT, " + TITLE_COLUMN + " varchar(50), " + YEAR_COLUMN + " int, " + RATING_COLUMN + " int, PRIMARY KEY(" + PK_COLUMN + "))";
+        System.out.println(createTableSQL);
+        statement.executeUpdate(createTableSQL);
+        
+        System.out.println("Created movie_reviews table");
+        
+        // So can check for a warning,
+        if (statement.getWarnings() != null)  {
+            
+            // Could also check for specific error code for a particular problem,
+            // if it's useful to know more about the error. statement.getWarnings().getErrorCode() == 1050
+            // checks for the 'can't create table' error code
+            
+            addTestData();  // You can comment this out, if you don't want to start with test data.
+        }
     }
     
     
